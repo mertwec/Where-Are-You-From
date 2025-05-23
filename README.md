@@ -32,7 +32,7 @@ python3 ./utils/gen_secret_key.py
 ### 3. Run in Docker
 
 ```bash
-docker-compose up --build
+docker compose up --build
 ```
 
 ### 4. The application will be available at:
