@@ -13,13 +13,16 @@ route = APIRouter()
 
 @route.get("/names/", response_model=NamePredictionResponse)
 async def get_name_info(
-    name: str = Query(...), session: AsyncSession = Depends(get_session)
+    name: str = Query(..., description="LastName for search", example="johnson"),
+        session: AsyncSession = Depends(get_session)
 ):
+    """This endpoint receives a name as a query parameter and returns information about the most likely countries
+    associated with that name."""
     if not name:
         raise HTTPException(
             status_code=400, detail="Query parameter 'name' is required"
         )
-
+    name = name.strip().lower()
     name_record = await crud.get_name(session, name)
 
     if name_record and check_access(name_record.last_accessed):
@@ -81,8 +84,11 @@ async def get_name_info(
 
 @route.get("/popular-names/", response_model=PopularNamesResponse)
 async def get_popular_names(
-    country: str = Query(None), session: AsyncSession = Depends(get_session)
+    country: str = Query(..., description="Country code as cca2", example="US"),
+    session: AsyncSession = Depends(get_session)
 ):
+    """This endpoint receives a country code (e.g. "US", "UA") as a query parameter and returns the top 5 most
+    frequent names associated with that country."""
     if not country:
         raise HTTPException(
             status_code=400, detail="Query parameter 'country' is required"

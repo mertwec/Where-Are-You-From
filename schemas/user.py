@@ -26,13 +26,6 @@ class UserData(UserBase):
     create_date: datetime
 
 
-class ListBaseUsers(BaseModel):
-    model_config = ConfigDict(from_attributes=True)
-
-    users: list[UserData]
-    count_users: int
-
-
 class Token(BaseModel):
     access_token: str
     token_type: str

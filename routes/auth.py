@@ -11,7 +11,7 @@ from schemas.user import InputUserData, Token, UserData
 route = APIRouter()
 
 
-@route.post("/")
+@route.post("/registration")
 async def registration(
     data_user: InputUserData, session: AsyncSession = Depends(get_session)
 ) -> UserData:

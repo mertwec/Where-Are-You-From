@@ -17,6 +17,8 @@ class Settings(BaseSettings):
     DB_HOST: str = "localhost"
     DB_PORT: str = "5432"
 
+    __TEST_DB_NAME: str = "db_base_test"
+
     SECRET_KEY: str = "secret_key-123"
     ALGORITHM: str = "HS256"
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
@@ -45,26 +47,33 @@ class Settings(BaseSettings):
 
         return log
 
-    def pg_dsn(self, engine_="asyncpg") -> str:
+    def pg_dns(self, engine_="asyncpg") -> str:
         return (
             f"postgresql+{engine_}://"
             f"{self.DB_USER}:{self.DB_PASSWORD}@"
             f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
         )
 
-    def sqlite_dsn(self) -> str:
+    def sqlite_dns(self) -> str:
         return f"sqlite+aiosqlite:///./{self.DB_NAME}.db"
 
-    def dsn(self, type_db="pg"):
+    def pg_test_dns(self, engine_="asyncpg") -> str:
+        return (
+            f"postgresql+{engine_}://"
+            f"{self.DB_USER}:{self.DB_PASSWORD}@"
+            f"{self.DB_HOST}:{self.DB_PORT}/{self.__TEST_DB_NAME}"
+        )
+
+    def dns(self, type_db="pg"):
         if type_db == "pg":
-            return self.pg_dsn()
-        return self.sqlite_dsn()
+            return self.pg_dns()
+        return self.sqlite_dns()
 
 
 settings_app = Settings()
 logger = settings_app.logger_init()
 
-DATABASE_URL = settings_app.dsn()
+DATABASE_URL = settings_app.dns()
 engine = create_async_engine(DATABASE_URL, echo=settings_app.DEBUG)
 async_session = async_sessionmaker(bind=engine, expire_on_commit=False)
 
