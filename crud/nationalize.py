@@ -1,14 +1,8 @@
 from sqlalchemy import desc, func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from werkzeug.security import generate_password_hash
 
 from models.nationalize import Country, Name, NameCountryPrediction
-from schemas.user import InputUserData
-
-# async def get_name(session: AsyncSession, name: str) -> Name:
-#     stmt = select(Name).where(Name.name == name)
-#     return await session.scalar(stmt)
 
 
 async def get_name(session: AsyncSession, name: str) -> Name:
@@ -55,9 +49,7 @@ async def increment_requests_name(session: AsyncSession, name_record: Name) -> N
     return name_record
 
 
-async def create_country(
-    session: AsyncSession, country_code: str, cdata: dict
-) -> Country:
+async def create_country(session: AsyncSession, country_code: str, cdata: dict) -> Country:
     country = Country(
         code=country_code,
         name=cdata.get("name", {}).get("common"),
@@ -88,9 +80,7 @@ async def create_name_country_prediction(
     country_record: Country,
     probability: float,
 ) -> NameCountryPrediction:
-    prediction = NameCountryPrediction(
-        name=name_record, country=country_record, probability=probability
-    )
+    prediction = NameCountryPrediction(name=name_record, country=country_record, probability=probability)
     session.add(prediction)
 
     await session.commit()

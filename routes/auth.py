@@ -12,14 +12,10 @@ route = APIRouter()
 
 
 @route.post("/registration")
-async def registration(
-    data_user: InputUserData, session: AsyncSession = Depends(get_session)
-) -> UserData:
+async def registration(data_user: InputUserData, session: AsyncSession = Depends(get_session)) -> UserData:
     user = await get_user(session, str(data_user.email))
     if user:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="User is exists"
-        )
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="User is exists")
     new_user = await create_user(session, data_user)
     return UserData.model_validate(new_user)
 
@@ -29,14 +25,11 @@ async def generate_token(
     form_data: OAuth2PasswordRequestForm = Depends(),
     session: AsyncSession = Depends(get_session),
 ):
-
     user = await get_user(session, user_email=form_data.username)
     password_hash = str(user.password_hash)
     if not user or not check_password_hash(password_hash, form_data.password):
         raise HTTPException(status_code=400, detail="Username or Password incorrect")
-    return Token(
-        access_token=create_access_token(data={"sub": user.email}), token_type="bearer"
-    )
+    return Token(access_token=create_access_token(data={"sub": user.email}), token_type="bearer")
 
 
 @route.get("/user_data/")

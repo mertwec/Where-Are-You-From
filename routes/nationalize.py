@@ -5,8 +5,7 @@ import crud
 from dependencies import api_request as apir
 from dependencies.checkers import check_access
 from dependencies.database import get_session
-from schemas.nationalize import (CountryPrediction, NamePredictionResponse,
-                                 PopularNamesResponse, TopNameStat)
+from schemas.nationalize import CountryPrediction, NamePredictionResponse, PopularNamesResponse, TopNameStat
 
 route = APIRouter()
 
@@ -14,14 +13,12 @@ route = APIRouter()
 @route.get("/names/", response_model=NamePredictionResponse)
 async def get_name_info(
     name: str = Query(..., description="LastName for search", example="johnson"),
-        session: AsyncSession = Depends(get_session)
+    session: AsyncSession = Depends(get_session),
 ):
     """This endpoint receives a name as a query parameter and returns information about the most likely countries
     associated with that name."""
     if not name:
-        raise HTTPException(
-            status_code=400, detail="Query parameter 'name' is required"
-        )
+        raise HTTPException(status_code=400, detail="Query parameter 'name' is required")
     name = name.strip().lower()
     name_record = await crud.get_name(session, name)
 
@@ -40,14 +37,10 @@ async def get_name_info(
 
     data_nationalization = await apir.get_nationalize(name)
     if not data_nationalization:
-        raise HTTPException(
-            status_code=502, detail="Failed to fetch from Nationalize.io"
-        )
+        raise HTTPException(status_code=502, detail="Failed to fetch from Nationalize.io")
 
     if not data_nationalization.get("country"):
-        raise HTTPException(
-            status_code=404, detail="No country prediction found for this name"
-        )
+        raise HTTPException(status_code=404, detail="No country prediction found for this name")
 
     if not name_record:
         name_record = await crud.create_name(session, name)
@@ -64,13 +57,9 @@ async def get_name_info(
 
         if not country_record:
             data_country = await apir.get_country(code)
-            country_record = await crud.create_country(
-                session, country_code=code, cdata=data_country
-            )
+            country_record = await crud.create_country(session, country_code=code, cdata=data_country)
 
-        await crud.create_name_country_prediction(
-            session, name_record, country_record, probability
-        )
+        await crud.create_name_country_prediction(session, name_record, country_record, probability)
         predictions_list.append(
             CountryPrediction(
                 country=country_record.name,
@@ -84,15 +73,13 @@ async def get_name_info(
 
 @route.get("/popular-names/", response_model=PopularNamesResponse)
 async def get_popular_names(
-    country: str = Query(..., description="Country code as cca2", example="US"),
-    session: AsyncSession = Depends(get_session)
+    country: str = Query(None, description="Country code as cca2", example="US"),
+    session: AsyncSession = Depends(get_session),
 ):
     """This endpoint receives a country code (e.g. "US", "UA") as a query parameter and returns the top 5 most
     frequent names associated with that country."""
     if not country:
-        raise HTTPException(
-            status_code=400, detail="Query parameter 'country' is required"
-        )
+        raise HTTPException(status_code=400, detail="Query parameter 'country' is required")
 
     country_record = await crud.get_country(session, country_code=country)
     if not country_record:
@@ -101,9 +88,7 @@ async def get_popular_names(
     names = await crud.get_top_names_by_country(session, country)
 
     if not names:
-        raise HTTPException(
-            status_code=404, detail="No name data found for this country"
-        )
+        raise HTTPException(status_code=404, detail="No name data found for this country")
 
     return PopularNamesResponse(
         country=country_record.name,

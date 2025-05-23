@@ -3,7 +3,9 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 import settings
-from routes import auth_route, debug_route, nationalize_route
+from routes.auth import route as auth_route
+from routes.debug_redirect import route as debug_route
+from routes.nationalize import route as nationalize_route
 from settings import logger
 
 app = FastAPI(description="Where Are You From", version="0.1", docs_url="/docs")
@@ -30,4 +32,4 @@ if settings.settings_app.DEBUG:
 
 if __name__ == "__main__":
     logger.info("run server")
-    uvicorn.run(f"{__name__}:app", reload=True)
+    uvicorn.run(f"{__name__}:app", reload=True, port=8500)

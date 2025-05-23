@@ -1,7 +1,8 @@
-import pytest
-from httpx import AsyncClient
-from unittest.mock import AsyncMock, patch
 import json
+from unittest.mock import AsyncMock, patch
+
+import pytest
+
 
 @pytest.mark.asyncio
 @patch("dependencies.api_request.get_nationalize", new_callable=AsyncMock)
@@ -12,13 +13,13 @@ async def test_get_name_info_success(mock_get_country, mock_get_nationalize, cli
         "name": "johnson",
         "country": [
             {"country_id": "US", "probability": 0.7},
-            {"country_id": "GB", "probability": 0.2}
-        ]
+            {"country_id": "GB", "probability": 0.2},
+        ],
     }
 
     mock_get_country.side_effect = lambda code: {
         "US": json.loads(r'{"name":{"common":"United States"}}'),
-        "GB": json.loads(r'{"name":{"common":"United Kingdom"}}')
+        "GB": json.loads(r'{"name":{"common":"United Kingdom"}}'),
     }[code]
 
     # Делаем запрос

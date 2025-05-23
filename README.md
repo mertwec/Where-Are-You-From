@@ -1,101 +1,66 @@
 # 🌍 Where Are You From
 
-Mini-сервис, который определяет вероятную страну происхождения человека по его имени, используя внешние API и сохраняет агрегированные данные в локальную базу. Подходит для использования исследователями, маркетологами и аналитиками.
 
----
+Mini service that determines a person's probable country of origin based on their name using external APIs and stores aggregated data in a local database. Suitable for use by researchers, marketers, and analysts.
 
-## 🚀 Технологии
 
-- Python 3.11+
-- FastAPI
-- PostgreSQL
-- SQLAlchemy
-- Docker + Docker Compose
-- Pytest
-- Ruff (линтинг и автоформатирование)
-- OpenAPI/Swagger
-- Nationalize.io + REST Countries API
+## 🔧 Setup and run
 
----
-
-## 🔧 Установка и запуск
-
-### 1. Клонировать репозиторий
+### 1. Clone repository
 
 ```bash
 git clone https://github.com/mertwec/Where-Are-You-From.git
 cd Where-Are-You-From
 ```
 
-### 2. Запуск в Docker
-bash
-```docker-compose up --build```
-Приложение будет доступно по адресу:
+###  2. 🌱 add file `.env` with parameters:
+for example see `.env_example`
+```
+SECRET_KEY = "your_secret key"
+
+DB_NAME = "db_name"
+DB_USER = "user_name"
+DB_PASSWORD = "password_db"
+
+DEBUG = False
+```
+For generate SECRET_KEY, use command:
+```bash
+python3 ./utils/gen_secret_key.py
+```
+
+### 3. Run in Docker
+
+```bash
+docker-compose up --build
+```
+
+### 4. The application will be available at:
 📍 http://localhost:8000
 
-📋 Примеры API
-GET /names/?name=Maria
-Возвращает список стран и вероятностей происхождения для указанного имени.
+---
 
-Если данные уже есть в базе и не старше суток — возвращается кэш.
+### 📋 Примеры API
 
-Иначе — выполняется запрос к Nationalize и REST Countries.
+|api|description|
+|---|---|
+|`GET /names/?name=johnson`|Returns a list of countries and origin probabilities for the specified name. If the data is already in the database and is not older than a day, the cache is returned. Otherwise, a request is made to Nationalize and REST Countries.|
+|`GET /popular-names/?country=US` |  Returns the top 5 most common names associated with a country. |
 
-GET /popular-names/?country=US
-Возвращает топ-5 самых частых имен, связанных со страной.
+### 🧪 Tests
+The tests use a test database
 
-🧪 Тестирование
-Для запуска unit-тестов:
+For run unit-tests:
+run docker with database postgres or create database "db_base_test"!!!
 
-bash
-Копіювати
-Редагувати
-pytest
-Тестовая БД используется автоматически при запуске тестов (SQLite).
+`pytest --cov=.`
 
-🔐 Аутентификация
-Для доступа к защищённым эндпоинтам используется JWT-авторизация.
-Токен можно получить через /auth/token.
+### 🔐 Authentication
+JWT authentication is used to access protected endpoints.
 
-🌱 Переменные окружения
-Создайте .env файл на основе .env.example:
 
-env
-Копіювати
-Редагувати
-POSTGRES_USER=admin
-POSTGRES_PASSWORD=admin
-POSTGRES_DB=whereyoufrom
-POSTGRES_HOST=db
-POSTGRES_PORT=5432
-DATABASE_URL=postgresql://admin:admin@db:5432/whereyoufrom
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=30
-🛠 Архитектура и структура
-bash
-Копіювати
-Редагувати
-app/
-├── api/              # маршруты FastAPI
-├── models/           # SQLAlchemy модели
-├── schemas/          # Pydantic-схемы
-├── crud/             # логика работы с БД
-├── services/         # обёртки над внешними API
-├── core/             # настройки, зависимости
-tests/
-docker-compose.yml
-📌 Возможные улучшения
-✅ Кэширование с Redis
-
-✅ Асинхронные запросы к внешним API
-
-✅ CI/CD через GitHub Actions
-
-✅ Автоматическое форматирование и линтинг с Ruff
-
-📚 Документация API
-Swagger доступен по адресу:
+### 📚 Документация API
+Swagger :
 🔗 http://localhost:8000/docs
 ReDoc:
 🔗 http://localhost:8000/redoc

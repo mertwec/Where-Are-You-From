@@ -2,7 +2,7 @@ import asyncio
 
 from werkzeug.security import generate_password_hash
 
-from models import Country, Name, NameCountryPrediction, User
+from models import Country, Name, NameCountryPrediction, User  # noqa: F401
 from settings import Base, async_session, engine
 
 

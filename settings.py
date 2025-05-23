@@ -2,8 +2,7 @@ import logging
 import os
 
 from pydantic_settings import BaseSettings, SettingsConfigDict
-from sqlalchemy.ext.asyncio import (AsyncAttrs, async_sessionmaker,
-                                    create_async_engine)
+from sqlalchemy.ext.asyncio import AsyncAttrs, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import DeclarativeBase
 
 
@@ -39,7 +38,7 @@ class Settings(BaseSettings):
             filemode="a",
             datefmt="%Y-%m-%d %H:%M:%S",
         )
-        log = logging.getLogger(name=f"project_log")
+        log = logging.getLogger(name="pr_log")
         log.setLevel(logging.INFO)
 
         if self.DEBUG:
@@ -48,11 +47,7 @@ class Settings(BaseSettings):
         return log
 
     def pg_dns(self, engine_="asyncpg") -> str:
-        return (
-            f"postgresql+{engine_}://"
-            f"{self.DB_USER}:{self.DB_PASSWORD}@"
-            f"{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
-        )
+        return f"postgresql+{engine_}://{self.DB_USER}:{self.DB_PASSWORD}@{self.DB_HOST}:{self.DB_PORT}/{self.DB_NAME}"
 
     def sqlite_dns(self) -> str:
         return f"sqlite+aiosqlite:///./{self.DB_NAME}.db"

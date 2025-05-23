@@ -3,7 +3,6 @@ from datetime import datetime, timedelta, timezone
 import jwt
 from fastapi import Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy import select
 
 from crud.user import get_user
 from dependencies.database import AsyncSession, get_session
@@ -18,9 +17,7 @@ def create_access_token(data: dict, expires_delta: timedelta | None = None):
         expires_delta = timedelta(minutes=15)
     expire = datetime.now(timezone.utc) + expires_delta
     data.update({"exp": expire})
-    encoded_jwt = jwt.encode(
-        data, settings_app.SECRET_KEY, algorithm=settings_app.ALGORITHM
-    )
+    encoded_jwt = jwt.encode(data, settings_app.SECRET_KEY, algorithm=settings_app.ALGORITHM)
     return encoded_jwt
 
 
@@ -50,9 +47,7 @@ def decode_access_token(token):
         raise_credentials_exception(f"Token decoding error: {e}")
 
 
-async def get_current_user(
-    token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_session)
-) -> User:
+async def get_current_user(token: str = Depends(oauth2_scheme), session: AsyncSession = Depends(get_session)) -> User:
     data_user = decode_access_token(token)
 
     if not data_user:
